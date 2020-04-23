@@ -1,4 +1,9 @@
 import sqlite3
+import datetime
+
+def string_to_date(date_string):
+    """Convert the date string to datetime object"""
+    return datetime.datetime.strptime(date_string, '%Y-%m-%d').date()
 
 
 class Db():
@@ -76,14 +81,73 @@ class Db():
 
     def insert_fundamentals_data(self, fundamental_dict):
         """Insert the index data to db"""
-        # try:
-        print(fundamental_dict)
-        self.cursor.execute("INSERT INTO fundamentals (symbol, date, sales, net_profit, eps, url) \
-                            VALUES (:symbol, :date, :sales, :net_profit, :eps, :url)",
-                            {"symbol": fundamental_dict['symbol'], "date": fundamental_dict['date'],
-                                "sales": fundamental_dict['sales'],
-                                "net_profit": fundamental_dict['net_profit'], "eps": fundamental_dict['eps'],
-                                "url": fundamental_dict['url']})
-        self.connection.commit()
-        # except sqlite3.IntegrityError as e:
-        #     pass
+        try:
+            print(fundamental_dict)
+            self.cursor.execute("INSERT INTO fundamentals (symbol, date, sales, net_profit, eps, url) \
+                                VALUES (:symbol, :date, :sales, :net_profit, :eps, :url)",
+                                {"symbol": fundamental_dict['symbol'], "date": fundamental_dict['date'],
+                                    "sales": fundamental_dict['sales'],
+                                    "net_profit": fundamental_dict['net_profit'], "eps": fundamental_dict['eps'],
+                                    "url": fundamental_dict['url']})
+            self.connection.commit()
+        except sqlite3.IntegrityError as e:
+            pass
+
+    def get_companies_with_fundamentals(self):
+        self.cursor.execute(
+            "SELECT DISTINCT symbol FROM fundamentals")
+        res = self.cursor.fetchall()
+        if len(res) == 0:
+            return False
+        else:
+            return [r[0] for r in res]
+
+    def check_bhav_copy_already_inserted(self, date):
+        '''Check whether the fundamental url is already scraped and updated the details into db'''
+        self.cursor.execute(
+            "SELECT * FROM stock_prices WHERE date = :date", {"date": date})
+        res = self.cursor.fetchall()
+        if len(res) == 0:
+            return False
+        else:
+            return True
+
+    def insert_stock_price_data(self, symbol, date, open_, high, low, close, volume):
+        """Insert the stock data to db"""
+        try:
+            self.cursor.execute("INSERT INTO stock_prices (symbol, date, open, high, low, close, volume) \
+                                VALUES (:symbol, :date, :open, :high, :low, :close, :volume)",
+                                {"symbol": symbol, "date": date, "open": open_, "high": high, "low": low, "close": close, "volume": volume})
+            self.connection.commit()
+        except sqlite3.IntegrityError as e:
+            pass
+
+    def get_available_dates(self, symbol):
+        """ Return the period end date of quarters from the fundamentals tabls for the symbol provided"""
+        self.cursor.execute(
+            "SELECT date FROM fundamentals WHERE symbol = :symbol ORDER BY date", {"symbol": symbol})
+        res = self.cursor.fetchall()
+        if len(res) == 0:
+            return False
+        dates = [string_to_date(date[0]) for date in res]
+        return dates
+
+    def get_over_the_year_fundamental_data(self, symbol, cur_date, over_year_date):
+        """
+        Return the fundamental data for the current date and an year before that for the symbol provided
+        """
+        self.cursor.execute("SELECT s.sales, l.sales, s.net_profit, l.net_profit, s.eps, l.eps \
+                                FROM fundamentals s JOIN fundamentals l \
+                                on s.symbol = l.symbol \
+                                WHERE s.symbol = :symbol \
+                                AND s.date = :over_year_date and l.date = :cur_date ",
+                                {"symbol": symbol, "cur_date": cur_date,
+                                 "over_year_date": over_year_date})
+        result = self.cursor.fetchone()  # (cur_quarter_sales, over_the_year_quarter_sales, cur_quarter_net profie, over_the_year_net_profit, cur_quarter_eps, over_the_year_quarter_eps)
+        return result
+    
+    def get_stock_price_for_period(self, symbol, start_date, end_date):
+        self.cursor.execute(
+            "SELECT avg(close) FROM stock_prices WHERE symbol = :symbol AND date >= :start_date AND date <= :end_date ORDER BY date", {"symbol": symbol, "start_date": start_date, "end_date": end_date})
+        res = self.cursor.fetchone()
+        return res[0]

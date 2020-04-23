@@ -132,3 +132,4 @@ dmypy.json
 # database
 fundmaster_db.db
 .DS_Store
+input_data_set.csv
