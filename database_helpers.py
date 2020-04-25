@@ -132,7 +132,7 @@ class Db():
         dates = [string_to_date(date[0]) for date in res]
         return dates
 
-    def get_over_the_year_fundamental_data(self, symbol, cur_date, over_year_date):
+    def get_over_the_period_fundamental_data(self, symbol, cur_date, over_period_date):
         """
         Return the fundamental data for the current date and an year before that for the symbol provided
         """
@@ -140,9 +140,9 @@ class Db():
                                 FROM fundamentals s JOIN fundamentals l \
                                 on s.symbol = l.symbol \
                                 WHERE s.symbol = :symbol \
-                                AND s.date = :over_year_date and l.date = :cur_date ",
+                                AND s.date = :over_period_date and l.date = :cur_date ",
                                 {"symbol": symbol, "cur_date": cur_date,
-                                 "over_year_date": over_year_date})
+                                 "over_period_date": over_period_date})
         result = self.cursor.fetchone()  # (cur_quarter_sales, over_the_year_quarter_sales, cur_quarter_net profie, over_the_year_net_profit, cur_quarter_eps, over_the_year_quarter_eps)
         return result
     
