@@ -147,6 +147,9 @@ class Db():
         return result
     
     def get_stock_price_for_period(self, symbol, start_date, end_date):
+        """
+        Return the stock prices over a period provided
+        """
         self.cursor.execute(
             "SELECT avg(close) FROM stock_prices WHERE symbol = :symbol AND date >= :start_date AND date <= :end_date ORDER BY date", {"symbol": symbol, "start_date": start_date, "end_date": end_date})
         res = self.cursor.fetchone()

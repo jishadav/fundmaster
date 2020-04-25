@@ -34,6 +34,13 @@ class FeatureExtractor():
         self.db.close()
 
     def extract_over_year_fundamental_features(self, symbol):
+        """
+        Extract the fundamental features for the symbol passed
+        Features are
+            Over the year quarterly Sales change
+            Over the year quarterly Net Profit Margin(npm) Change
+            Over the year quarterly EPS Change
+        """
         dates = self.db.get_available_dates(symbol)
         fundamental_features_df = pd.DataFrame(
             columns=['symbol', 'date', 'Sales Change', 'Net Profit Margin Change', 'EPS Change'])
@@ -53,6 +60,10 @@ class FeatureExtractor():
         return fundamental_features_df
 
     def extract_prev_qtr_fundamental_features(self, over_year_change_df):
+        """
+        Find the changes in sales, npm, and eps from the previous quarter 
+        This is calculated on top of the over the year fundamental features already calculated
+        """
         for row in range(len(over_year_change_df)):
             symbol = over_year_change_df.loc[row, 'symbol']
             cur_date = over_year_change_df.loc[row, 'date']
@@ -88,6 +99,11 @@ class FeatureExtractor():
         return over_year_change_df
 
     def calculate_target_variable(self, symbol, previous_quarter_end_date):
+        """
+        Calculate the target variable for the immediate next quarter indicated by the previous_quarter_end_date parameter
+        Target value indicates whether there is change in stock price in the quarter.
+        If the stock price is increased during the quarter the target value is set to 1 else it is zero.
+        """
         first_month_start_date = previous_quarter_end_date + timedelta(days=1)
         first_month_first_half_end_date = first_month_start_date + \
             timedelta(days=14)
@@ -100,13 +116,7 @@ class FeatureExtractor():
             timedelta(days=14)
         third_month_second_half_stock_average_price = self.db.get_stock_price_for_period(
             symbol, third_month_second_half_start_date, third_month_end_date)
-
-        # if first_month_first_half_stock_average_price and third_month_second_half_stock_average_price:
-        #     quarter_price_difference = third_month_second_half_stock_average_price - \
-        #         first_month_first_half_stock_average_price
-        #     target_value = 1 if quarter_price_difference > 0 else 0
-        #     return target_value
-
+        
         if first_month_first_half_stock_average_price and third_month_second_half_stock_average_price:
             quarter_price_change = change_between_numbers(first_month_first_half_stock_average_price, third_month_second_half_stock_average_price)
             # third_month_second_half_stock_average_price - \
@@ -119,6 +129,9 @@ class FeatureExtractor():
             return False
 
     def prepare_input_data_set(self):
+        '''
+        Prepare the input data set
+        '''
         companies_list = self.db.get_companies_with_fundamentals()
         input_data_set = pd.DataFrame(columns=['symbol', 'date', 'Sales Change', 'Net Profit Margin Change',
                                                'EPS Change', 'prev_qtr_sales_change', 'prev_qtr_npm_change',
