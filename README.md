@@ -24,6 +24,13 @@ Companies selected were from the S&P BSE 500 index. We fetched previous 6 years 
 Daily stock prices were collected from the *BSE bhav copies*.
 
 After fetching the data we are storing it in an SQLite database. 
+Databse helper functions can be used as
+```
+from database_helpers import Db
+db = Db()
+security_code = 500010
+db.get_company_details_from_sec_code(str(security_code))
+```
 
 To run the functions in the data scraper module, an example is as follows
 
