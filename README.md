@@ -6,7 +6,7 @@ This is an experimental work to find out the effect of quarterly results on the 
 
 To predict increase or decrease in the stock price after the announcement of quarterly financial results. Assumption is that the companies announce the results for a quarter at least before the third month of the next quarter. 
 
-Assume a company announces their results for previous quarter during the quarter Q. I took the average price of the second half of the third month of Q. Subtracted this from the average price of the first half of the first month of Q. This difference specifies the increase or decrase on the stock price, which is my target variable. I addressed this as a classification problem. 
+Assume a company announces their results for previous quarter during the quarter Q. I took the average price of the second half of the third month of Q. Subtracted this from the average price of the first half of the first month of Q. This difference specifies the increase or decrease on the stock price, which is my target variable. I addressed this as a classification problem. 
 
 ## Approach
 
@@ -21,7 +21,7 @@ My approach to this problem consists of following major steps
 
 Quarterly financial results and stock price data are extracted from the BSE website.
 Companies selected were from the S&P BSE 500 index. We fetched previous 6 years data.
-Daily stock prices were collected from the BSE bhav copies.
+Daily stock prices were collected from the *BSE bhav copies*.
 
 After fetching the data we are storing it in an SQLite database. 
 
@@ -34,7 +34,7 @@ scraper.download_bse_500_index_list()
 ```
 There are functions for 
 
-+ Updating the latest company list into db
++ Updating the latest company list into Database
 + Downloading the S&P BSE 500 index listed companies
 + Extracting the fundamental data 
 + Collecting the stock prices data 
@@ -72,16 +72,16 @@ feature_extractor.prepare_input_data_set()
 
 For training, basic algorithms like Decision tree, Random forest etc. are tried out. 
 Input data set consisted of 10201 samples with 6 features. 
-Implementation is done with the help of scikit learn libraries.
-Experements can be found in the ```Stock price prediction``` notebook
+Implementation is done with the help of Scikit-learn libraries.
+Experiments can be found in the ```Stock price prediction``` notebook
 
 ### 4. Results and future work
 
-Initially I have used only the previous quarter changes as features. A decision tree classfier gave 55.48 % accuracy and  50.68 precison value. Precision is important here as in real market we are selecting the postive cases only and the number of true cases should be maximised.
+Initially I have used only the previous quarter changes as features. A decision tree classifier gave 55.48 % accuracy and  50.68 precision value. Precision is important here as in real market we are selecting the positive cases only and the number of true cases should be maximised.
 
-Later I used year over year quarterly changes as my features. For the the decision tree classifier produced 56.20 % accuracy and 50.11 precison
+Later I used year over year quarterly changes as my features. For the decision tree classifier produced 56.20 % accuracy and 50.11 precision
 
-Then I combined these features and which gave 56.80 % accuracy and 51.25 % precison values
+Then I combined these features and which gave 56.80 % accuracy and 51.25 % precision values
 
 I know these values are not at all exciting, but getting a 50% accuracy itself is great in stock market and people make money even with that with proper risk money management and profit booking strategies.
 
