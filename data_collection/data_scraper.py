@@ -150,7 +150,7 @@ class Scraper():
                 else:
                     return
 
-    def extract__complete_fundamental_data(self, company_df):
+    def extract_complete_fundamental_data(self, company_df):
         '''
         Scrape the fundamental data of all the symbols in the dataframe provided
         '''

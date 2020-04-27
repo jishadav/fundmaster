@@ -9,7 +9,7 @@ from feature_extraction import FeatureExtractor
 # scraper.download_bse_500_index_list()
 
 # bse_500_df = pd.read_csv('MarketWatch.csv')
-# scraper.extract__complete_fundamental_data(bse_500_df)
+# scraper.extract_complete_fundamental_data(bse_500_df)
 
 # end_date = datetime.datetime.now().date()
 # start_date = (end_date - relativedelta(years=6))
